@@ -2,6 +2,7 @@ import { NativeModules } from 'react-native';
 
 export type Options = {
   path: String;
+  local_path?: String;
   stickers: Array<String>;
 };
 

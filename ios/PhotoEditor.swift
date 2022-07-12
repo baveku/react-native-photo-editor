@@ -28,18 +28,34 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
     func open(options: NSDictionary, resolve:@escaping RCTPromiseResolveBlock,reject:@escaping RCTPromiseRejectBlock) -> Void {
         
         // handle path
-        guard let path = options["path"] as? String else {
+        var path = ""
+        if options["path"] == nil && options["local_path"] == nil {
             reject("DONT_FIND_IMAGE", "Dont find image", nil)
-            return;
+            return
         }
-        
-        getUIImage(url: path) { image in
-            DispatchQueue.main.async {
-                //  set config
-                self.setConfiguration(options: options, resolve: resolve, reject: reject)
-                self.presentController(image: image)
+
+        var url: URL? = nil
+
+        if let pathOption = options["path"] as? String {
+            path = pathOption
+            url = URL(string: path)
+        }
+
+        if let pathOption = options["local_path"] as? String {
+            path = pathOption
+            url = URL(fileURLWithPath: path)
+        }
+        if let url = url {
+            getUIImage(url: path) { image in
+                DispatchQueue.main.async {
+                    //  set config
+                    self.setConfiguration(options: options, resolve: resolve, reject: reject)
+                    self.presentController(image: image)
+                }
+            } reject: {_ in
+                
             }
-        } reject: {_ in
+        } else {
             reject("LOAD_IMAGE_FAILED", "Load image failed: " + path, nil)
         }
     }
@@ -91,9 +107,8 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
     }
     
     
-    private func getUIImage (url: String ,completion:@escaping (UIImage) -> (), reject:@escaping(String)->()){
-        if let path = URL(string: url) {
-            SDWebImageManager.shared.loadImage(with: path, options: .continueInBackground, progress: { (recieved, expected, nil) in
+    private func getUIImage (url: URL, completion:@escaping (UIImage) -> (), reject:@escaping(String)->()){
+        SDWebImageManager.shared.loadImage(with: url, options: .continueInBackground, progress: { (recieved, expected, nil) in
             }, completed: { (downloadedImage, data, error, SDImageCacheType, true, imageUrlString) in
                 DispatchQueue.main.async {
                     if(error != nil){
@@ -106,9 +121,6 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
                     }
                 }
             })
-        }else{
-            reject("false")
-        }
     }
     
 }

@@ -5,6 +5,7 @@ let exportObject = {};
 
 const defaultOptions = {
   path: '',
+  local_path: undefined,
   stickers: [],
 };
 
