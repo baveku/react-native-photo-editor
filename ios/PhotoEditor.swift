@@ -46,7 +46,7 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
             url = URL(fileURLWithPath: path)
         }
         if let url = url {
-            getUIImage(url: path) { image in
+            getUIImage(url: url) { image in
                 DispatchQueue.main.async {
                     //  set config
                     self.setConfiguration(options: options, resolve: resolve, reject: reject)
