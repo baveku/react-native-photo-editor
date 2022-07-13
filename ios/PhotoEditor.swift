@@ -32,10 +32,17 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
             reject("DONT_FIND_IMAGE", "Dont find image", nil)
             return
         }
-
+        var pathURL = ""
         var url: URL? = nil
         if let path = options["path"] as? String {
+            pathURL = path
             url = URL(string: path)
+            
+            // LOCAL IMAGE
+            if let url = url, url.scheme == "ph" {
+                let identifier = url.host
+                url = NSURL.sd_URL(withAssetLocalIdentifier: identifier) as URL
+            }
         }
 
         if let url = url {
@@ -46,10 +53,10 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
                     self.presentController(image: image)
                 }
             } reject: {_ in
-                reject(false)
+                reject("LOAD_IMAGE_FAILED", "Load image failed: " + pathURL, nil)
             }
         } else {
-            reject("LOAD_IMAGE_FAILED", "Load image failed: " + path, nil)
+            reject("LOAD_IMAGE_FAILED", "Load image failed: " + pathURL, nil)
         }
     }
 
