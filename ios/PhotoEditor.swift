@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import Photos
 import SDWebImage
+import SDWebImagePhotosPlugin
 import AVFoundation
 //import ZLImageEditor
 
@@ -39,9 +40,10 @@ class PhotoEditor: NSObject, ZLEditImageControllerDelegate {
             url = URL(string: path)
             
             // LOCAL IMAGE
-            if let url = url, url.scheme == "ph" {
-                let identifier = url.host
-                url = NSURL.sd_URL(withAssetLocalIdentifier: identifier) as URL
+            if let urls = url,
+			   urls.scheme == "ph",
+			   let identifier = urls.host {
+				url = NSURL.sd_URL(withAssetLocalIdentifier: identifier) as URL
             }
         }
 
